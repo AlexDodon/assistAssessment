@@ -1,0 +1,27 @@
+<problem language="Python">
+<text>
+The student is hereby asked to implement a function _flatten_ that takes one argument, a
+deep list, and returns a flattened list. Order matters. First take elements from nested lists.
+</text>
+<example>
+flatten([[[1, 2, 3], [4, 5]], 6])
+</example>
+<solution>
+def _flatten(L):
+    for item in L:
+        try:
+            yield from flatten(item)
+        except TypeError:
+            yield item
+
+def flatten(L):
+    return list(_flatten(L))
+</solution>
+<tests>
+flatten([[[1, 2, 3], [4, 5]], 6])
+flatten([[[2, 3, 4], [5, 6]], 7])
+flatten([[[3, 4, 5], [6, 7]], 8])
+flatten([[[4, 5, 6], [7, 8]], 9])
+flatten([[[5, 6, 7], [8, 9]], 10])
+</tests>
+</problem>

@@ -33,7 +33,10 @@ def evaluateSourceOnTest(source, test, language):
 
         p = subprocess.run(['ghci', '/tmp/assistAssessment/toEvalFile.hs'], input='main', text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         
-        result = p.stdout
+        result = p.stdout.split('\n')
+        del result[-2:-1]
+        del result[0:3]
+        result = '\n'.join(result)
 
         shutil.rmtree('/tmp/assistAssessment')
 
@@ -221,19 +224,19 @@ def getArgs():
     parser = argparse.ArgumentParser(description='Script that assists in creating programming problems and evaluating solutions to them.')
 
     parser.add_argument('-E','--evaluate', dest='command', action='store_const',
-        const=evaluate, help='Mutually exclusive with -F. Evaluate the source[s] specified by -s with regard to the problem specified by -p.')
+        const=evaluate, help='Mutually exclusive with -F. Evaluate the source[s] specified by -s with regard to the problem specified by -p and it\'s desired language specified by -l. For each -p, there should be a -l. The order matters. If using -a, pass a single -s. Otherwise, pass as many -s as -p.')
 
     parser.add_argument('-p','--problem-path', dest='problemPathList', action='append', metavar='problemPath', 
-        help='Path to a problem file. Can pass multiple times to specify multiple problem files. Useful with -d. For each student\'s source files, the problem files are considered in the specified order.')
+        help='Path to a problem file. Can pass multiple times to specify multiple problem files. If using -a, that means that each student should have solved that many problems. Students that have less source files in their archive will not be graded')
 
     parser.add_argument('-s','--source-path', dest='sourcePathList', action='append', metavar='sourcePath',
-        help='Path to source file[s] to be evaluated. Usually point to an archive with multiple students with -d. Can evaluate a source file independently by not passing -d. Can pass multiple times to evaluate multiple sources independently or multiple archives.')
+        help='Path to source file[s] to be evaluated. When using -a, it should point to an archive and be passed a single time. Otherwise, each source file specified by -s corresponds to a problem description given by -p.')
 
     parser.add_argument('-a','--is-archive', dest='archive', action='store_const', const=True, default=False,
-        help='specifies the source path to be a path to an archive of sources.')
+        help='Specifies the source path to be a path to an archive of sources. When used, should pass a single -s.')
         
     parser.add_argument('-l','--language', dest='languageList', action='append', metavar='language',
-        help='Specifies the programming language that will be used to evaluate. Accepts \"Python\", \"Haskell\", \"ML\", \"Lisp\". Can specify multiple languages. Order matters. If multiple languages specified, will consider matching sources to be')
+        help='Specifies the programming language that will be used to evaluate the sources. Accepts \"Python\", \"Haskell\", \"ML\", \"Lisp\". Each problem description given by -p should have a coresponding -l that specifies the language that should be used. XML tags with the appropriate language attribute should be found in the problem description.')
 
     return parser.parse_args()
 

@@ -1,18 +1,30 @@
-<problem language="Python">
+<problem>
 <text>
 Would the student please implement a function named _myZip_ that takes as arguments 2 lists
 and zips them?
 </text>
-<example>
+<example language="Python">
 myZip([1,2,3],["a","b","c"])
 </example>
-<solution>
+<solution language="Python">
 def myZip(a,b):
     return list(zip(a,b))
 </solution>
-<tests>
+<tests language="Python">
 myZip(["a","b","c"],[1,2,3])
 myZip([1,2,3],["a","b","c"])
 myZip([1,2,3],[1,2,3])
+</tests>
+<example language="Haskell">
+myZip [1,2,3] ["a","b","c"]
+</example>
+<solution language="Haskell">
+myZip::[a] -> [b] -> [(a,b)]
+myZip = zip
+</solution>
+<tests language="Haskell">
+myZip ["a","b","c"] [1,2,3]
+myZip [1,2,3] ["a","b","c"]
+myZip [1,2,3] [1,2,3]
 </tests>
 </problem> 

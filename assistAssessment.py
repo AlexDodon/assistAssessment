@@ -7,7 +7,6 @@ import xml.etree.ElementTree as ET
 
 def evaluateSourceOnTest(source, test, language):
     result = ''
-    print("this is the source"+source)
     if language == 'Python':
         source += '\n'
         for testLine in test.split('\n'):
@@ -31,12 +30,11 @@ def evaluateSourceOnTest(source, test, language):
         f.write(toEvalFile)
         f.close()
 
-        p = subprocess.run(['ghci', '/tmp/assistAssessment/toEvalFile.hs'], input='main', text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.run(['stack', 'ghc','--', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+        p = subprocess.run('/tmp/sol', text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         
-        result = p.stdout.split('\n')
-        del result[-2:-1]
-        del result[0:3]
-        result = '\n'.join(result)
+        result = p.stdout
 
         shutil.rmtree('/tmp/assistAssessment')
 
@@ -108,12 +106,23 @@ def readSourceArchive(sourcePath):
 
     return readSourceDir(unzippedDirectory)
 
-def getAnswersAndTests(problemPathList, languageList):
+def parseProblemFiles(problemPathList, languageList):
+    texts = []
+    examples = []
     solutions = []
     tests = []
     for problem, language  in zip(problemPathList, languageList):
         root = ET.parse(problem).getroot()
     
+        for text in root.findall('text'):
+            texts.append(text.text)
+            break
+
+        for example in root.findall('example'):
+            if example.attrib['language'] == language:
+                examples.append(example.text.replace('\n',''))
+                break
+
         for solution in root.findall('solution'):
             if solution.attrib['language'] == language:
                 solutions.append(solution.text)
@@ -124,9 +133,7 @@ def getAnswersAndTests(problemPathList, languageList):
                 tests.append(test.text)
                 break
 
-    answers = [evaluateSourceOnTest(solution, test, language) for solution, test, language in zip(solutions, tests, languageList)]
-
-    return (answers,tests)
+    return (texts, examples, solutions, tests)
 
 def evaluateArchive(sourcePath, answers, tests, languageList):
     names, sources = readSourceArchive(sourcePath)
@@ -198,40 +205,13 @@ def evaluateStandaloneSources(sourcePathList, answers, tests, languageList):
             print('The given solution is wrong.')
         print('------------------------------------------------')
 
-
-def getTextSolutionAndtest(problemPathList,languageList):
-    t=""
-    s=""
-    ts=""
-
-    for problem,language in zip(problemPathList,languageList):
-        root=ET.parse(problem).getroot()
-
-        for text in root.findall('text'):
-            t=text.text
-            break
-        for solution in root.findall('solution'):
-            if solution.attrib['language']==language:
-                s=solution.text
-                break
-
-        for test in root.findall('tests'):
-            if test.attrib['language'] == language:
-                ts=test.text
-                break
-
-    
-
-    return(t,s,ts)
-
 def processLatex(string):
     return ""+"\\texttt{"+string.split("\n")[0]+"}"
 
-
 def processExample(test,result):
-    return "\nE.g. :"+processLatex(test)+"should return"+processLatex(result)+"."
+    return "\nE.g. " + processLatex(test) + " should return " + processLatex(result)+"."
 
-def processPython(text,solution,test,language):
+def processPython(text,solution,test):
     finaltext=""
     first=text.split(":")[0]
     finaltext+=first
@@ -243,80 +223,51 @@ def processPython(text,solution,test,language):
     second=text.split(":")[1]
     finaltext+=second
 
-    result=evaluateSourceOnTest(solution,test,language)
+    result=evaluateSourceOnTest(solution,test,'Python')
     example=processExample(test,result)
     finaltext+=example
-
-    
 
     return finaltext
 
-
-
-
-
-
-def processHaskell(text,solution,test,language):
+def processHaskell(text,solution,test):
     
     finaltext=""
     first=text.split(":")[0]
     finaltext+=first
 
-    signature=solution.split(" ")[1]
-    signature=signature[:-2]
+    signature=solution.split("\n")[1]
     finaltext+=processLatex(signature)
 
     second=text.split(":")[1]
     finaltext+=second
 
-    result=evaluateSourceOnTest(solution,test,language)
+    result=evaluateSourceOnTest(solution,test,'Haskell')
     example=processExample(test,result)
     finaltext+=example
-
-    
 
     return finaltext
 
 
 def format(args):
-    problemPath =args.problemPathList
-    languageList=args.languageList
-    language=languageList[0]
-    text,solution,test=getTextSolutionAndtest(problemPath,languageList)
+    problemPathList = args.problemPathList
+    languageList = args.languageList
+    texts, examples, solutions, _ = parseProblemFiles(problemPathList,languageList)
 
+    for problemPath, text, example, solution , language in zip(problemPathList, texts, examples, solutions, languageList):
+        finalTex = ''
+        ouptutPath = problemPath.replace('.xml','.' + language + '.tex')
 
-    print(text)
-    print(solution)
-    test=test.split("\n")[1]
-    print(test)
-    #l=[i.split('\n')[1] for i in solutions]
-   # print (l)
-   # t=[i.split('()')[0]for i in texts]
-   # print(t)
-   # file=open("mine.tex","w")
-   # str1 = ''.join(t)
-   # file.write(str1)
-   # test=[i.split('\n')[1] for i in tests]
-   # finaltext=process(texts,solutions,)
+        if language=='Python':
+            finalTex = processPython(text,solution,example)
+        
+        if language=='Haskell':
+            finalTex = processHaskell(text,solution,example)
+        
+        print(finalTex)
 
-    
-    if language=='Python':
-    
-        finaltextP=processPython(text,solution,test,'Python')
-        finalfileP=open("mineP.tex","w")
-        print(finaltextP)
-        finalfileP.write(finaltextP)
-        finalfileP.close()
-    if language=='Haskell':
-        finaltextH==processHaskell(text,solution,test,'Haskell')
-        finalfileH=open("mineH.tex","w")
-        finalfileH.write(finaltextH)
-        finalfileH.close()
-
-
-
-    
-
+        with open(ouptutPath,"w") as finalFile:
+            finalFile.write(finalTex)
+            finalFile.close()
 
 def evaluate(args):
     problemPathList = args.problemPathList
@@ -324,7 +275,9 @@ def evaluate(args):
     archive = args.archive
     languageList = args.languageList
 
-    answers, tests = getAnswersAndTests(problemPathList, languageList)    
+    _, _, solutions, tests = parseProblemFiles(problemPathList, languageList)    
+
+    answers = [evaluateSourceOnTest(solution, test, language) for solution, test, language in zip(solutions, tests, languageList)]
 
     if archive:
         evaluateArchive(sourcePathList[0], answers, tests, languageList)
@@ -332,11 +285,9 @@ def evaluate(args):
         evaluateStandaloneSources(sourcePathList, answers, tests, languageList)
     
 def validateArgs(args):
-    if args.command==format:
-        print("test")
-    else:
-        assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.'
-
+    assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.'
+    
+    if args.command==evaluate:
         if args.archive:
             assert len(args.sourcePathList) == 1, 'When using -a, pass a single -s argument'
         else:
@@ -344,9 +295,6 @@ def validateArgs(args):
 
 def getArgs():
     parser = argparse.ArgumentParser(description='Script that assists in creating programming problems and evaluating solutions to them.')
-    
-
-
 
     bar=parser.add_mutually_exclusive_group()
     bar.add_argument('-E','--evaluate', dest='command', action='store_const',
@@ -354,7 +302,7 @@ def getArgs():
     
     
     bar.add_argument('-F','--format', dest='command', action='store_const',
-        const=format, help='Mutually exclusive with -F. Evaluate the source[s] specified by -s with regard to the problem specified by -p and it\'s desired language specified by -l')
+        const=format, help='Mutually exclusive with -E. PLACEHOLDER.')
 
     
     parser.add_argument('-p','--problem-path', dest='problemPathList', action='append', metavar='problemPath', 

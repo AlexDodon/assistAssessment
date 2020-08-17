@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 def evaluateSourceOnTest(source, test, language):
     result = ''
-
+    print("this is the source"+source)
     if language == 'Python':
         source += '\n'
         for testLine in test.split('\n'):
@@ -199,6 +199,125 @@ def evaluateStandaloneSources(sourcePathList, answers, tests, languageList):
         print('------------------------------------------------')
 
 
+def getTextSolutionAndtest(problemPathList,languageList):
+    t=""
+    s=""
+    ts=""
+
+    for problem,language in zip(problemPathList,languageList):
+        root=ET.parse(problem).getroot()
+
+        for text in root.findall('text'):
+            t=text.text
+            break
+        for solution in root.findall('solution'):
+            if solution.attrib['language']==language:
+                s=solution.text
+                break
+
+        for test in root.findall('tests'):
+            if test.attrib['language'] == language:
+                ts=test.text
+                break
+
+    
+
+    return(t,s,ts)
+
+def processLatex(string):
+    return ""+"\\texttt{"+string.split("\n")[0]+"}"
+
+
+def processExample(test,result):
+    return "\nE.g. :"+processLatex(test)+"should return"+processLatex(result)+"."
+
+def processPython(text,solution,test,language):
+    finaltext=""
+    first=text.split(":")[0]
+    finaltext+=first
+
+    signature=solution.split(" ")[1]
+    signature=signature[:-2]
+    finaltext+=processLatex(signature)
+
+    second=text.split(":")[1]
+    finaltext+=second
+
+    result=evaluateSourceOnTest(solution,test,language)
+    example=processExample(test,result)
+    finaltext+=example
+
+    
+
+    return finaltext
+
+
+
+
+
+
+def processHaskell(text,solution,test,language):
+    
+    finaltext=""
+    first=text.split(":")[0]
+    finaltext+=first
+
+    signature=solution.split(" ")[1]
+    signature=signature[:-2]
+    finaltext+=processLatex(signature)
+
+    second=text.split(":")[1]
+    finaltext+=second
+
+    result=evaluateSourceOnTest(solution,test,language)
+    example=processExample(test,result)
+    finaltext+=example
+
+    
+
+    return finaltext
+
+
+def format(args):
+    problemPath =args.problemPathList
+    languageList=args.languageList
+    language=languageList[0]
+    text,solution,test=getTextSolutionAndtest(problemPath,languageList)
+
+
+    print(text)
+    print(solution)
+    test=test.split("\n")[1]
+    print(test)
+    #l=[i.split('\n')[1] for i in solutions]
+   # print (l)
+   # t=[i.split('()')[0]for i in texts]
+   # print(t)
+   # file=open("mine.tex","w")
+   # str1 = ''.join(t)
+   # file.write(str1)
+   # test=[i.split('\n')[1] for i in tests]
+   # finaltext=process(texts,solutions,)
+
+    
+    if language=='Python':
+    
+        finaltextP=processPython(text,solution,test,'Python')
+        finalfileP=open("mineP.tex","w")
+        print(finaltextP)
+        finalfileP.write(finaltextP)
+        finalfileP.close()
+    if language=='Haskell':
+        finaltextH==processHaskell(text,solution,test,'Haskell')
+        finalfileH=open("mineH.tex","w")
+        finalfileH.write(finaltextH)
+        finalfileH.close()
+
+
+
+    
+
+
 def evaluate(args):
     problemPathList = args.problemPathList
     sourcePathList = args.sourcePathList
@@ -213,19 +332,31 @@ def evaluate(args):
         evaluateStandaloneSources(sourcePathList, answers, tests, languageList)
     
 def validateArgs(args):
-    assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.'
-
-    if args.archive:
-        assert len(args.sourcePathList) == 1, 'When using -a, pass a single -s argument'
+    if args.command==format:
+        print("test")
     else:
-        assert len(args.sourcePathList) == len(args.languageList), 'When evaluating independent source files(no -a), the number of -s arguments must match the number of -l and -p arguments'
+        assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.'
+
+        if args.archive:
+            assert len(args.sourcePathList) == 1, 'When using -a, pass a single -s argument'
+        else:
+            assert len(args.sourcePathList) == len(args.languageList), 'When evaluating independent source files(no -a), the number of -s arguments must match the number of -l and -p arguments'
 
 def getArgs():
     parser = argparse.ArgumentParser(description='Script that assists in creating programming problems and evaluating solutions to them.')
+    
 
-    parser.add_argument('-E','--evaluate', dest='command', action='store_const',
-        const=evaluate, help='Mutually exclusive with -F. Evaluate the source[s] specified by -s with regard to the problem specified by -p and it\'s desired language specified by -l. For each -p, there should be a -l. The order matters. If using -a, pass a single -s. Otherwise, pass as many -s as -p.')
 
+
+    bar=parser.add_mutually_exclusive_group()
+    bar.add_argument('-E','--evaluate', dest='command', action='store_const',
+        const=evaluate, help='Mutually exclusive with -F. Evaluate the source[s] specified by -s with regard to the problem specified by -p and it\'s desired language specified by -l')
+    
+    
+    bar.add_argument('-F','--format', dest='command', action='store_const',
+        const=format, help='Mutually exclusive with -F. Evaluate the source[s] specified by -s with regard to the problem specified by -p and it\'s desired language specified by -l')
+
+    
     parser.add_argument('-p','--problem-path', dest='problemPathList', action='append', metavar='problemPath', 
         help='Path to a problem file. Can pass multiple times to specify multiple problem files. If using -a, that means that each student should have solved that many problems. Students that have less source files in their archive will not be graded')
 

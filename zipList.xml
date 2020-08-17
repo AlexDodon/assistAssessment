@@ -1,7 +1,6 @@
 <problem>
 <text>
-Would the student please implement a function named _myZip_ that takes as arguments 2 lists
-and zips them?
+Write a function : which takes as arguments 2 lists and zips them .
 </text>
 <example language="Python">
 myZip([1,2,3],["a","b","c"])
@@ -11,7 +10,7 @@ def myZip(a,b):
     return list(zip(a,b))
 </solution>
 <tests language="Python">
-myZip(["a","b","c"],[1,2,3])
+myZip(["a","b","c"],[1,2,4])
 myZip([1,2,3],["a","b","c"])
 myZip([1,2,3],[1,2,3])
 </tests>

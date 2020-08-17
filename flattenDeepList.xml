@@ -1,13 +1,13 @@
 <problem>
 <text>
-The student is hereby asked to implement a function _flatten_ that takes one argument, a
-deep list, and returns a flattened list. Order matters. First take elements from nested lists.
+Write a function : which takes one argument , a deep list , and resturns a flatten list , Order matters ,first take elements from nested lists.
+
 </text>
 <example language="Python">
 flatten([[[1, 2, 3], [4, 5]], 6])
 </example>
 <solution language="Python">
-def _flatten(L):
+def flattenA(L):
     for item in L:
         try:
             yield from flatten(item)
@@ -15,7 +15,7 @@ def _flatten(L):
             yield item
 
 def flatten(L):
-    return list(_flatten(L))
+    return list(flattenA(L))
 </solution>
 <tests language="Python">
 flatten([[[1, 2, 3], [4, 5]], 6])

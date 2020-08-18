@@ -1,0 +1,24 @@
+<problem>
+<text>
+Write a function [[function]] which takes one argument, an integer n, and resturns a list containing the first primes up to n. [[genericExample]]
+</text>
+<example language="PolyML">
+primes(20);
+</example>
+<solution language="PolyML">
+fun primes n =
+    let
+        fun enum (n, m) = if n > m then [] else n :: enum (n+1, m)
+        fun sieve [] = []
+        | sieve (n::ns) = n :: sieve (List.filter (fn m => m mod n > 0) ns)
+    in
+        sieve (enum (2, n))
+    end
+</solution>
+<tests language="PolyML">
+primes(20);
+primes(30);
+primes(50);
+primes(100);
+</tests>
+</problem>

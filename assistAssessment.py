@@ -120,7 +120,7 @@ def parseProblemFiles(problemPathList, languageList):
 
         for example in root.findall('example'):
             if example.attrib['language'] == language:
-                examples.append(example.text.replace('\n',''))
+                examples.append(example.text)
                 break
 
         for solution in root.findall('solution'):
@@ -205,48 +205,36 @@ def evaluateStandaloneSources(sourcePathList, answers, tests, languageList):
             print('The given solution is wrong.')
         print('------------------------------------------------')
 
-def processLatex(string):
-    return ""+"\\texttt{"+string.split("\n")[0]+"}"
-
-def processExample(test,result):
-    return "\nE.g. " + processLatex(test) + " should return " + processLatex(result)+"."
-
-def processPython(text,solution,test):
-    finaltext=""
-    first=text.split(":")[0]
-    finaltext+=first
-
-    signature=solution.split(" ")[1]
-    signature=signature[:-2]
-    finaltext+=processLatex(signature)
-
-    second=text.split(":")[1]
-    finaltext+=second
-
-    result=evaluateSourceOnTest(solution,test,'Python')
-    example=processExample(test,result)
-    finaltext+=example
-
-    return finaltext
-
-def processHaskell(text,solution,test):
+def formatTex(text, solution, example, language):
+    if language == 'Python':
+        text = text[1:-1]
+        signature = solution.split('\n')[1][4:-1]
+        example = example[1:-1]
+        result = evaluateSourceOnTest(solution, example, 'Python')[:-1]
     
-    finaltext=""
-    first=text.split(":")[0]
-    finaltext+=first
+    if language == 'Haskell':
+        text = text[1:-1]
+        signature = solution.split("\n")[1]
+        example = example[1:-1]
+        result = evaluateSourceOnTest(solution, example, 'Haskell')[:-1]
 
-    signature=solution.split("\n")[1]
-    finaltext+=processLatex(signature)
+    texWrapper = lambda s : '\\texttt{' + s + '}'
 
-    second=text.split(":")[1]
-    finaltext+=second
+    finalText = text.replace(
+        '[[function]]',
+        texWrapper(signature)
+    ).replace(
+        '[[callExample]]',
+        texWrapper(example)
+    ).replace(
+        '[[exampleResult]]',
+        texWrapper(result)
+    ).replace(
+        '[[genericExample]]',
+        'E.g. ' + texWrapper(example) + ' should return ' + texWrapper(result) + '.'
+    )
 
-    result=evaluateSourceOnTest(solution,test,'Haskell')
-    example=processExample(test,result)
-    finaltext+=example
-
-    return finaltext
-
+    return finalText
 
 def format(args):
     problemPathList = args.problemPathList
@@ -257,13 +245,9 @@ def format(args):
         finalTex = ''
         ouptutPath = problemPath.replace('.xml','.' + language + '.tex')
 
-        if language=='Python':
-            finalTex = processPython(text,solution,example)
+        finalTex = formatTex(text,solution,example,language)
         
-        if language=='Haskell':
-            finalTex = processHaskell(text,solution,example)
-        
-        print(finalTex)
+        print(finalTex +'\n\n')
 
         with open(ouptutPath,"w") as finalFile:
             finalFile.write(finalTex)

@@ -1,6 +1,6 @@
 <problem>
 <text>
-Write a function : which takes as arguments 2 lists and zips them.
+Write a function [[function]] which takes as arguments 2 lists and zips them. For example, [[callExample]] must definitely return [[exampleResult]].
 </text>
 <example language="Python">
 myZip([1,2,3],["a","b","c"])

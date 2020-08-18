@@ -1,7 +1,6 @@
 <problem>
 <text>
-Write a function : which takes one argument , a deep list , and resturns a flatten list , Order matters ,first take elements from nested lists.
-
+Write a function [[function]] which takes one argument, a deep list, and resturns a flat list. Order matters,first take elements from nested lists. [[genericExample]]
 </text>
 <example language="Python">
 flatten([[[1, 2, 3], [4, 5]], 6])

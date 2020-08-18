@@ -38,6 +38,40 @@ def evaluateSourceOnTest(source, test, language):
 
         shutil.rmtree('/tmp/assistAssessment')
 
+    if language == 'CommonLisp':
+        source += '\n'
+        for testLine in test.split('\n'):
+            if testLine != '':
+                source += '(pprint ' + testLine + ')\n'
+
+        os.mkdir('/tmp/assistAssessment')
+        f = open('/tmp/assistAssessment/toEvalFile.lsp','w')
+        f.write(source)
+        f.close()
+        
+        p = subprocess.run(['sbcl', '--script', '/tmp/assistAssessment/toEvalFile.lsp'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        
+        result = p.stdout[1:]
+
+        shutil.rmtree('/tmp/assistAssessment')
+
+    if language == 'PolyML':
+        programInput = ''
+        for testLine in test.split('\n'):
+            if testLine != '':
+                programInput += testLine
+
+        os.mkdir('/tmp/assistAssessment')
+        f = open('/tmp/assistAssessment/toEvalFile.ml','w')
+        f.write(source)
+        f.close()
+        
+        p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/toEvalFile.ml'], input=programInput, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        
+        result = '\n'.join(p.stdout.split('val it = ')[1:])
+
+        shutil.rmtree('/tmp/assistAssessment')
+
     return result
 
 def gradeStudentAnswer(studentAnswer, answer, student):
@@ -217,6 +251,18 @@ def formatTex(text, solution, example, language):
         signature = solution.split("\n")[1]
         example = example[1:-1]
         result = evaluateSourceOnTest(solution, example, 'Haskell')[:-1]
+    
+    if language == 'CommonLisp':
+        text = text[1:-1]
+        signature = solution.split("\n")[1][7:]
+        example = example[1:-1]
+        result = evaluateSourceOnTest(solution, example, 'CommonLisp')[:-1]
+    
+    if language == 'PolyML':
+        text = text[1:-1]
+        signature = solution.split("\n")[1][4:-1]
+        example = example[1:-1]
+        result = evaluateSourceOnTest(solution, example, 'PolyML')[:-1]
 
     texWrapper = lambda s : '\\texttt{' + s + '}'
 
@@ -301,7 +347,7 @@ def getArgs():
         help='When using -E, -a specifies the source path to be a path to an archive of sources. When used, should pass a single -s.')
         
     parser.add_argument('-l','--language', dest='languageList', action='append', metavar='language',
-        help='Specifies the programming language that, in case of -E, will be used to evaluate the sources and in case of -F to populate the text. Accepts \"Python\", \"Haskell\", \"PolyML\", \"Lisp\". Each problem description given by -p should have a coresponding -l that specifies the language that should be used. XML tags with the appropriate language attribute should be found in the problem description.')
+        help='Specifies the programming language that, in case of -E, will be used to evaluate the sources and in case of -F to populate the text. Accepts \"Python\", \"Haskell\", \"PolyML\", \"CommonLisp\". Each problem description given by -p should have a coresponding -l that specifies the language that should be used. XML tags with the appropriate language attribute should be found in the problem description.')
 
     return parser.parse_args()
 

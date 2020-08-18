@@ -26,4 +26,28 @@ myZip ["a","b","c"] [1,2,3]
 myZip [1,2,3] ["a","b","c"]
 myZip [1,2,3] [1,2,3]
 </tests>
+<example language="CommonLisp">
+(myZip '(a b c) '(1 2 3))
+</example>
+<solution language="CommonLisp">
+(defun myZip (a b)
+  (mapcar #'list a b ))
+</solution>
+<tests language="CommonLisp">
+(myZip '(a b c) '(1 2 3))
+(myZip '(1 2 3) '(1 2 3))
+(myZip '(1 2 3) '(a b c))
+</tests>
+<example language="PolyML">
+myZip ([1,2,3], ["a","b","c"])
+</example>
+<solution language="PolyML">
+fun myZip [] [] = []
+  | myZip (x::xs) (y::ys) = (x,y)::(myZip (xs,ys))
+</solution>
+<tests language="PolyML">
+myZip (["a","b","c"], [1,2,3])
+myZip ([1,2,3], ["a","b","c"])
+myZip ([1,2,3], [1,2,3])
+</tests>
 </problem> 

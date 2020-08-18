@@ -285,9 +285,11 @@ def evaluate(args):
         evaluateStandaloneSources(sourcePathList, answers, tests, languageList)
     
 def validateArgs(args):
+    assert args.command == format or args.command == evaluate, 'Must pass either -F or -E.'
+
     assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.'
     
-    if args.command==evaluate:
+    if args.command == evaluate:
         if args.archive:
             assert len(args.sourcePathList) == 1, 'When using -a, pass a single -s argument'
         else:
@@ -302,20 +304,20 @@ def getArgs():
     
     
     bar.add_argument('-F','--format', dest='command', action='store_const',
-        const=format, help='Mutually exclusive with -E. PLACEHOLDER.')
+        const=format, help='Mutually exclusive with -E. Format the problem text specified by -p and the desired language specified by -l to a latex format.')
 
     
     parser.add_argument('-p','--problem-path', dest='problemPathList', action='append', metavar='problemPath', 
-        help='Path to a problem file. Can pass multiple times to specify multiple problem files. If using -a, that means that each student should have solved that many problems. Students that have less source files in their archive will not be graded')
+        help='Path to a problem file. Can pass multiple times to specify multiple problem files. For each -p, you should specify a -l. With regards to -E, if using -a, that means that each student should have solved that many problems. Students that have less source files in their archive will not be graded')
 
     parser.add_argument('-s','--source-path', dest='sourcePathList', action='append', metavar='sourcePath',
-        help='Path to source file[s] to be evaluated. When using -a, it should point to an archive and be passed a single time. Otherwise, each source file specified by -s corresponds to a problem description given by -p.')
+        help='Path to source file[s] to be evaluated. With regards to -E, when using -a, it should point to an archive and be passed a single time. Otherwise, each source file specified by -s corresponds to a problem description given by -p.')
 
     parser.add_argument('-a','--is-archive', dest='archive', action='store_const', const=True, default=False,
-        help='Specifies the source path to be a path to an archive of sources. When used, should pass a single -s.')
+        help='When using -E, -a specifies the source path to be a path to an archive of sources. When used, should pass a single -s.')
         
     parser.add_argument('-l','--language', dest='languageList', action='append', metavar='language',
-        help='Specifies the programming language that will be used to evaluate the sources. Accepts \"Python\", \"Haskell\", \"ML\", \"Lisp\". Each problem description given by -p should have a coresponding -l that specifies the language that should be used. XML tags with the appropriate language attribute should be found in the problem description.')
+        help='Specifies the programming language that, in case of -E, will be used to evaluate the sources and in case of -F to populate the text. Accepts \"Python\", \"Haskell\", \"PolyML\", \"Lisp\". Each problem description given by -p should have a coresponding -l that specifies the language that should be used. XML tags with the appropriate language attribute should be found in the problem description.')
 
     return parser.parse_args()
 

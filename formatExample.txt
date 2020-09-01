@@ -1,5 +1,0 @@
-python assistAssessment.py -F -p genPrimes.xml -l PolyML > formatExample.txt
-
-Write a function \texttt{primes n } which takes one argument, an integer n, and resturns a list containing the first primes up to n. E.g. \texttt{primes(20);} should return \texttt{[2, 3, 5, 7, 11, 13, 17, 19]: int list}.
-
-

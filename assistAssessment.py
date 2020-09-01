@@ -26,18 +26,20 @@ def evaluateSourceOnTest(source, test, language):
         
         toEvalFile += 'where\n' + source
 
-        os.mkdir('/tmp/assistAssessment')
-        f = open('/tmp/assistAssessment/toEvalFile.hs','w')
-        f.write(toEvalFile)
-        f.close()
+        try:
+            os.mkdir('/tmp/assistAssessment')
+            f = open('/tmp/assistAssessment/toEvalFile.hs','w')
+            f.write(toEvalFile)
+            f.close()
 
-        p = subprocess.run(['stack', 'ghc','--', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = subprocess.run(['stack', 'ghc','--', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-        p = subprocess.run('/tmp/sol', text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        
-        result = p.stdout
+            p = subprocess.run('/tmp/sol', text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            
+            result = p.stdout
 
-        shutil.rmtree('/tmp/assistAssessment')
+        finally:
+            shutil.rmtree('/tmp/assistAssessment')
 
     if language == 'CommonLisp':
         source += '\n'
@@ -45,16 +47,18 @@ def evaluateSourceOnTest(source, test, language):
             if testLine != '':
                 source += '(pprint ' + testLine + ')\n'
 
-        os.mkdir('/tmp/assistAssessment')
-        f = open('/tmp/assistAssessment/toEvalFile.lsp','w')
-        f.write(source)
-        f.close()
-        
-        p = subprocess.run(['sbcl', '--script', '/tmp/assistAssessment/toEvalFile.lsp'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        
-        result = p.stdout[1:]
+        try:
+            os.mkdir('/tmp/assistAssessment')
+            f = open('/tmp/assistAssessment/toEvalFile.lsp','w')
+            f.write(source)
+            f.close()
+            
+            p = subprocess.run(['sbcl', '--script', '/tmp/assistAssessment/toEvalFile.lsp'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            
+            result = p.stdout[1:]
 
-        shutil.rmtree('/tmp/assistAssessment')
+        finally:
+            shutil.rmtree('/tmp/assistAssessment')
 
     if language == 'PolyML':
         programInput = ''
@@ -62,16 +66,18 @@ def evaluateSourceOnTest(source, test, language):
             if testLine != '':
                 programInput += testLine
 
-        os.mkdir('/tmp/assistAssessment')
-        f = open('/tmp/assistAssessment/toEvalFile.ml','w')
-        f.write(source)
-        f.close()
-        
-        p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/toEvalFile.ml'], input=programInput, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        
-        result = '\n'.join(p.stdout.split('val it = ')[1:])
+        try:
+            os.mkdir('/tmp/assistAssessment')
+            f = open('/tmp/assistAssessment/toEvalFile.ml','w')
+            f.write(source)
+            f.close()
+            
+            p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/toEvalFile.ml'], input=programInput, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            
+            result = '\n'.join(p.stdout.split('val it = ')[1:])
 
-        shutil.rmtree('/tmp/assistAssessment')
+        finally:
+            shutil.rmtree('/tmp/assistAssessment')
 
     return result
 
@@ -265,7 +271,23 @@ def formatTex(text, solution, example, language):
     
     if language == 'PolyML':
         text = text[1:-1]
-        signature = solution.split("\n")[1][4:-1]
+
+        try:
+            os.mkdir('/tmp/assistAssessment')
+            f = open('/tmp/assistAssessment/getSignature.ml','w')
+            f.write(solution)
+            f.close()
+            
+            functionName = solution.split(' ')[1]
+
+            p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/getSignature.ml'], input=functionName, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            
+            signature = p.stdout.split('\n')
+            signature = functionName + signature[-2][6:]
+
+        finally:
+            shutil.rmtree('/tmp/assistAssessment')
+
         example = example[1:-1]
 
     result = evaluateSourceOnTest(solution, example, language)[:-1]

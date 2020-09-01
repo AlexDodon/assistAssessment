@@ -1,8 +1,13 @@
 <problem>
 <text>
-Write a function [[function]] which takes as arguments 2 lists and zips them. For example, [[callExample]] must definitely return [[exampleResult]].
+Write a function [[function]] which takes as arguments 2 lists and zips them. For example, [[callExample]] must definitely return [[exampleResult]], while on the other hand, [[callExample]] should most certainly return [[exampleResult]].
+
+YOU CAN JUST USE [[ genericExample ]] (without spaces) AND IT WILL PRINT ALL EXAMPLES. SEE:
+
+[[genericExample]]
 </text>
 <example language="Python">
+myZip(["a","b","c"],[1,2,4])
 myZip([1,2,3],["a","b","c"])
 </example>
 <solution language="Python">
@@ -15,7 +20,9 @@ myZip([1,2,3],["a","b","c"])
 myZip([1,2,3],[1,2,3])
 </tests>
 <example language="Haskell">
+myZip ["a","b","c"] [1,2,3]
 myZip [1,2,3] ["a","b","c"]
+myZip [1,2,3] [1,2,3]
 </example>
 <solution language="Haskell">
 myZip::[a] -> [b] -> [(a,b)]
@@ -39,11 +46,12 @@ myZip [1,2,3] [1,2,3]
 (myZip '(1 2 3) '(a b c))
 </tests>
 <example language="PolyML">
+myZip (["a","b","c"], [1,2,3])
 myZip ([1,2,3], ["a","b","c"])
+myZip ([1,2,3], [1,2,3])
 </example>
 <solution language="PolyML">
-fun myZip [] [] = []
-  | myZip (x::xs) (y::ys) = (x,y)::(myZip (xs,ys))
+
 </solution>
 <tests language="PolyML">
 myZip (["a","b","c"], [1,2,3])

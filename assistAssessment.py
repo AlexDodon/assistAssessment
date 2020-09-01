@@ -282,31 +282,48 @@ def formatTex(text, solution, example, language):
 
             p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/getSignature.ml'], input=functionName, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             
-            signature = p.stdout.split('\n')
-            signature = functionName + signature[-2][6:]
+            signature = functionName + p.stdout.split('\n')[-2][6:]
 
         finally:
             shutil.rmtree('/tmp/assistAssessment')
 
         example = example[1:-1]
 
-    result = evaluateSourceOnTest(solution, example, language)[:-1]
+    examples = example.split('\n')
+    results = [evaluateSourceOnTest(solution, ex, language)[:-1] for ex in examples]
+    examplesAndResults = list(zip(examples, results))
 
     texWrapper = lambda s : '\\texttt{' + s + '}'
+
+    genericExample = 'E.g. '
+    for i, (ex, result) in enumerate(examplesAndResults):
+        genericExample += texWrapper(ex) + ' should return ' + texWrapper(result)
+        
+        if i < len(examplesAndResults) - 2:
+            genericExample += ', '
+        if i == len(examplesAndResults) - 2:
+            genericExample += ', while '
+        if i == len(examplesAndResults) - 1:
+            genericExample += '.'
 
     finalText = text.replace(
         '[[function]]',
         texWrapper(signature)
     ).replace(
-        '[[callExample]]',
-        texWrapper(example)
-    ).replace(
-        '[[exampleResult]]',
-        texWrapper(result)
-    ).replace(
         '[[genericExample]]',
-        'E.g. ' + texWrapper(example) + ' should return ' + texWrapper(result) + '.'
+        genericExample
     )
+
+    for ex, result in examplesAndResults:
+        finalText = finalText.replace(
+            '[[callExample]]',
+            texWrapper(ex),
+            1
+        ).replace(
+            '[[exampleResult]]',
+            texWrapper(result),
+            1
+        )
 
     return finalText
 

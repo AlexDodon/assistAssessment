@@ -3,6 +3,7 @@ import subprocess
 import argparse
 import zipfile
 import shutil
+import itertools
 import xml.etree.ElementTree as ET
 
 def evaluateSourceOnTest(source, test, language):
@@ -184,26 +185,33 @@ def evaluateArchive(sourcePath, answers, tests, languageList):
 
         if maxNameLength < len(student):
             maxNameLength = len(student)
-        
-        studentScore = 0
+
+        answersPermutations = itertools.permutations(answers)
+        studentMaxScore = 0
         numberOfStudentSources = len(studentSources)
 
-        if numberOfStudentSources == numberOfProblems:
-            for answer, language, studentSource, test in zip(answers, languageList, studentSources, tests):
+        for answersPerm in answersPermutations: 
+        
+            studentScore = 0
+
+            for answer, language, studentSource, test in zip(answersPerm, languageList, studentSources, tests):
                 studentAnswer = evaluateSourceOnTest(studentSource, test, language)
 
                 if gradeStudentAnswer(studentAnswer, answer, student):
                     studentScore += 1
             
-            grade = '{}/{}'.format(studentScore,numberOfProblems)
+            if studentScore > studentMaxScore:
+                studentMaxScore = studentScore
 
-            print('------------------------------------------------')
-            print(student + ' has solved correctly ' + grade + ' problems.')
+            if studentMaxScore == numberOfProblems:
+                break
 
-            grades.append(grade)
-        else:
-            print(student + ' has less source files than expected. Not grading any.')
-            grades.append('N/A')
+        grade = '{}/{}'.format(studentMaxScore,numberOfProblems)
+
+        print('------------------------------------------------')
+        print(student + ' has solved correctly ' + grade + ' problems.')
+
+        grades.append(grade)
             
         count.append('{}/{}'.format(numberOfStudentSources,numberOfProblems))
     
@@ -244,25 +252,23 @@ def formatTex(text, solution, example, language):
         text = text[1:-1]
         signature = solution.split('\n')[1][4:-1]
         example = example[1:-1]
-        result = evaluateSourceOnTest(solution, example, 'Python')[:-1]
     
     if language == 'Haskell':
         text = text[1:-1]
         signature = solution.split("\n")[1]
         example = example[1:-1]
-        result = evaluateSourceOnTest(solution, example, 'Haskell')[:-1]
     
     if language == 'CommonLisp':
         text = text[1:-1]
         signature = solution.split("\n")[1][7:]
         example = example[1:-1]
-        result = evaluateSourceOnTest(solution, example, 'CommonLisp')[:-1]
     
     if language == 'PolyML':
         text = text[1:-1]
         signature = solution.split("\n")[1][4:-1]
         example = example[1:-1]
-        result = evaluateSourceOnTest(solution, example, 'PolyML')[:-1]
+
+    result = evaluateSourceOnTest(solution, example, language)[:-1]
 
     texWrapper = lambda s : '\\texttt{' + s + '}'
 

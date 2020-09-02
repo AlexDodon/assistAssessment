@@ -1,2 +1,2 @@
 # assistAssessment
-script to automate test creatiation and grading
+script to automate test creation and grading.

@@ -1,12 +1,15 @@
 import os
 import subprocess
 import argparse
-import zipfile
 import shutil
 import itertools
 import xml.etree.ElementTree as ET
 
 def evaluateSourceOnTest(source, test, language):
+    #Central point for executing code
+    #From each execution it just captures stdout and stderr
+    #Because of this, generally, each test (line) is wrapped by some print statement
+    #If there are problems with dependencies, change the command run in supbrocess.run; for example, in the case of Haskell use the system ghc instead of the stack ghc by changing the command list to ['ghc', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs']
     result = ''
     if language == 'Python':
         source += '\n'
@@ -26,7 +29,7 @@ def evaluateSourceOnTest(source, test, language):
         
         toEvalFile += 'where\n' + source
 
-        try:
+        try: #The try blocks are to assure we clean up 
             os.mkdir('/tmp/assistAssessment')
             f = open('/tmp/assistAssessment/toEvalFile.hs','w')
             f.write(toEvalFile)
@@ -103,11 +106,11 @@ def readSourceDir(dirPath):
     sources = []
 
     for studentDir in os.listdir(dirPath):
-        names.append(studentDir)
+        names.append(studentDir) #Assumes the directories are named after the names of students
         
         studentDir = os.path.join(dirPath,studentDir)
         files = os.listdir(studentDir)
-        files.sort()
+        files.sort()#Probably not necessary
 
         files = [os.path.join(studentDir,file) for file in files]
 
@@ -117,12 +120,13 @@ def readSourceDir(dirPath):
 
     return (names, sources)
 
-def unzipTo(sourcePath, unzippedDirectory):
-    with zipfile.ZipFile(sourcePath,'r') as zip_ref:
-        zip_ref.extractall(unzippedDirectory)
+def unpackTo(sourcePath, unpackedDirectory):
+    #This function should unpack the archive in a format of containing_dir->many student_dirs->each having source files(one per problem)
+    #As of now, it assumes the archive to contain a number of student dirs, each containing an archive with source files; If another archive structure is desired, this code should be rewrote, but the unpacked directory's structure should probably remain the same; otherwise rewrite readSourceDir
+    shutil.unpack_archive(sourcePath, unpackedDirectory)
 
-    for studentDir in os.listdir(unzippedDirectory):
-        studentDir = os.path.join(unzippedDirectory,studentDir)
+    for studentDir in os.listdir(unpackedDirectory):
+        studentDir = os.path.join(unpackedDirectory,studentDir)
         
         assert os.path.isdir(studentDir), 'Found unexpected file in archive: ' + studentDir
     
@@ -132,22 +136,22 @@ def unzipTo(sourcePath, unzippedDirectory):
 
         problemsArchive = os.path.join(studentDir,studentDirContents[0])
         
-        with zipfile.ZipFile(problemsArchive,'r') as zip_ref:
-            zip_ref.extractall(studentDir)
+        shutil.unpack_archive(problemsArchive, studentDir)
         
         os.remove(problemsArchive)
 
 def readSourceArchive(sourcePath):
-    unzippedDirectory = sourcePath.replace('.zip','')
+    unpackedDirectory = sourcePath.replace('.zip','')
     
-    if not os.path.isdir(unzippedDirectory):  
-        os.mkdir(unzippedDirectory)
+    if not os.path.isdir(unpackedDirectory):  
+        os.mkdir(unpackedDirectory)
     
-        unzipTo(sourcePath,unzippedDirectory)
+        unpackTo(sourcePath,unpackedDirectory)
 
-    return readSourceDir(unzippedDirectory)
+    return readSourceDir(unpackedDirectory)
 
 def parseProblemFiles(problemPathList, languageList):
+    #Central point for interfacing with the xml specification file
     texts = []
     examples = []
     solutions = []
@@ -177,34 +181,36 @@ def parseProblemFiles(problemPathList, languageList):
     return (texts, examples, solutions, tests)
 
 def evaluateArchive(sourcePath, answers, tests, languageList):
-    names, sources = readSourceArchive(sourcePath)
+    studentsNames, sources = readSourceArchive(sourcePath)
     numberOfProblems = len(answers)
     grades = []
     count = []
-    maxNameLength = 0
+    answersPermutations = list(itertools.permutations(answers))
 
-    for student, studentSources in zip(names, sources):
+    for studentName, studentSources in zip(studentsNames, sources):
         print('------------------------------------------------')
         print('------------------------------------------------')
         print('------------------------------------------------')
-        print('\n\tGrading ' + student + '\'s solutions:\n')
+        print('\n\tGrading ' + studentName + '\'s solutions:\n')
 
-        if maxNameLength < len(student):
-            maxNameLength = len(student)
-
-        answersPermutations = itertools.permutations(answers)
         studentMaxScore = 0
-        numberOfStudentSources = len(studentSources)
 
         for answersPerm in answersPermutations: 
+            print('------------------------------------------------')
+            print('Testing a new permutation of answers.')
         
             studentScore = 0
 
             for answer, language, studentSource, test in zip(answersPerm, languageList, studentSources, tests):
                 studentAnswer = evaluateSourceOnTest(studentSource, test, language)
 
-                if gradeStudentAnswer(studentAnswer, answer, student):
+                if gradeStudentAnswer(studentAnswer, answer, studentName):
                     studentScore += 1
+            
+            tempGrade = '{}/{}'.format(studentScore,numberOfProblems)
+
+            print('For this permutation of answers, ' + studentName + ' has solved correctly ' + tempGrade + ' problems.')
+            print('------------------------------------------------')
             
             if studentScore > studentMaxScore:
                 studentMaxScore = studentScore
@@ -215,20 +221,21 @@ def evaluateArchive(sourcePath, answers, tests, languageList):
         grade = '{}/{}'.format(studentMaxScore,numberOfProblems)
 
         print('------------------------------------------------')
-        print(student + ' has solved correctly ' + grade + ' problems.')
+        print('In the end, ' + studentName + ' has solved correctly ' + grade + ' problems.')
 
         grades.append(grade)
             
-        count.append('{}/{}'.format(numberOfStudentSources,numberOfProblems))
+        count.append('{}/{}'.format(len(studentSources),numberOfProblems))
     
     print('------------------------------------------------')
     print('------------------------------------------------')
     print('------------------------------------------------')
-    print('Results:\n')
+    print('Results:\n') #Formatting of results is hardcoded; gets thrown off by names that are too long
     
     print('{:30}| {:20}| {}'.format('Name', 'Number of sources', 'Grade'))
     print('------------------------------------------------------------')
-    for line in zip(names, count, grades):
+
+    for line in zip(studentsNames, count, grades):
         print('{:30}| {:20}| {}'.format(*line))
 
 def evaluateStandaloneSources(sourcePathList, answers, tests, languageList):
@@ -255,9 +262,9 @@ def evaluateStandaloneSources(sourcePathList, answers, tests, languageList):
 
 def formatTex(text, solution, example, language):
     if language == 'Python':
-        text = text[1:-1]
-        signature = solution.split('\n')[1][4:-1]
-        example = example[1:-1]
+        text = text[1:-1] #This gets rid of newlines from not having all the text betwen xml tags on a single line
+        signature = solution.split('\n')[1][4:-1] #Look at the solution for why it is done like this; assuming the main function is writen from the first line, the split and [1] picks the first line and [4:-1] gets rid of "fun " and ":"
+        example = example[1:-1] #Same thing as for the text
     
     if language == 'Haskell':
         text = text[1:-1]
@@ -280,7 +287,7 @@ def formatTex(text, solution, example, language):
             
             functionName = solution.split(' ')[1]
 
-            p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/getSignature.ml'], input=functionName, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = subprocess.run(['poly', '--use', '/tmp/assistAssessment/getSignature.ml'], input=functionName, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) #After getting the name of the function from the solution, we write it to stdin for the interpreter and get its signature
             
             signature = functionName + p.stdout.split('\n')[-2][6:]
 
@@ -306,7 +313,8 @@ def formatTex(text, solution, example, language):
         if i == len(examplesAndResults) - 1:
             genericExample += '.'
 
-    finalText = text.replace(
+    #Here, you can change all the tags for formatting without changing functionality.
+    finalText = text.replace( #Here we replace ALL occurences of [[function]] and [[genericExample]]
         '[[function]]',
         texWrapper(signature)
     ).replace(
@@ -315,7 +323,7 @@ def formatTex(text, solution, example, language):
     )
 
     for ex, result in examplesAndResults:
-        finalText = finalText.replace(
+        finalText = finalText.replace( #Here we replace ONLY THE FIRST occurence; hence we can have more and loop through examples
             '[[callExample]]',
             texWrapper(ex),
             1
@@ -355,14 +363,14 @@ def evaluate(args):
     answers = [evaluateSourceOnTest(solution, test, language) for solution, test, language in zip(solutions, tests, languageList)]
 
     if archive:
-        evaluateArchive(sourcePathList[0], answers, tests, languageList)
+        evaluateArchive(sourcePathList[0], answers, tests, languageList) # The source path is still given as a list even if there is only one
     else:
         evaluateStandaloneSources(sourcePathList, answers, tests, languageList)
     
 def validateArgs(args):
     assert args.command == format or args.command == evaluate, 'Must pass either -F or -E.'
 
-    assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.'
+    assert len(args.problemPathList) == len(args.languageList), 'The number of -l arguments must match the number of -p arguments.' #This matters for both format and evaluate
     
     if args.command == evaluate:
         if args.archive:
@@ -401,7 +409,7 @@ def main():
 
     validateArgs(args)
 
-    args.command(args)
+    args.command(args) #Based on the -E or -F flag, executes functionality
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Arch Linux) (preloaded format=pdflatex 2020.9.2)  5 SEP 2020 19:52
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Arch Linux) (preloaded format=pdflatex 2020.9.2)  5 SEP 2020 20:32
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -130,43 +130,43 @@ Overfull \hbox (2.00722pt too wide) in paragraph at lines 112--113
 his place-holder. Each
  []
 
-[2]
-Overfull \hbox (4.18387pt too wide) in paragraph at lines 145--146
+[2] [3]
+Overfull \hbox (4.18387pt too wide) in paragraph at lines 148--149
 []\OT1/cmr/m/n/12 E.g. \OT1/cmtt/m/n/12 python assistAssessment.py -F -p zipLis
 t.xml -l Haskell
  []
 
 
-Overfull \hbox (6.58551pt too wide) in paragraph at lines 145--146
+Overfull \hbox (6.58551pt too wide) in paragraph at lines 148--149
 \OT1/cmtt/m/n/12 -p zipList.xml -l Python -p genPrimes.xml -l PolyML \OT1/cmr/m
 /n/12 should re-
  []
 
-[3]
-Overfull \hbox (11.50854pt too wide) in paragraph at lines 170--171
+
+Overfull \hbox (11.50854pt too wide) in paragraph at lines 173--174
 []\OT1/cmr/m/n/12 E.g. \OT1/cmtt/m/n/12 python assistAssessment.py -E -p flatte
 nDeepList.xml
  []
 
 
-Overfull \hbox (41.89957pt too wide) in paragraph at lines 170--171
+Overfull \hbox (41.89957pt too wide) in paragraph at lines 173--174
 \OT1/cmtt/m/n/12 -l Python -s sampleSolutions/p1.py -p genPrimes.xml -l PolyML
  []
 
 [4] [5]
-Overfull \hbox (30.03355pt too wide) in paragraph at lines 249--250
+Overfull \hbox (30.03355pt too wide) in paragraph at lines 252--253
 []\OT1/cmr/m/n/12 E.g. \OT1/cmtt/m/n/12 python assistAssessment.py -E -a -p fla
 ttenDeepList.xml
  []
 
 
-Overfull \hbox (29.54956pt too wide) in paragraph at lines 249--250
+Overfull \hbox (29.54956pt too wide) in paragraph at lines 252--253
 \OT1/cmtt/m/n/12 -l Python -p zipList.xml -l Python -s student^^SsSolutions.zip
 
  []
 
 [6] [7]
-Overfull \hbox (0.2651pt too wide) in paragraph at lines 371--372
+Overfull \hbox (0.2651pt too wide) in paragraph at lines 374--375
 []\OT1/cmr/m/n/12 The sec-ond is \OT1/cmtt/m/n/12 formatTex(text, solution, exa
 mple, language)\OT1/cmr/m/n/12 . This
  []
@@ -186,7 +186,7 @@ uper-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
 f-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/ty
 pe1/public/amsfonts/cm/cmtt12.pfb></usr/share/texmf-dist/fonts/type1/public/cm-
 super/sfrm1200.pfb>
-Output written on documentation.pdf (8 pages, 70174 bytes).
+Output written on documentation.pdf (8 pages, 70296 bytes).
 PDF statistics:
  52 PDF objects out of 1000 (max. 8388607)
  36 compressed objects within 1 object stream

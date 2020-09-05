@@ -3,6 +3,7 @@ import subprocess
 import argparse
 import shutil
 import itertools
+import re
 import xml.etree.ElementTree as ET
 
 def evaluateSourceOnTest(source, test, language):
@@ -141,7 +142,7 @@ def unpackTo(sourcePath, unpackedDirectory):
         os.remove(problemsArchive)
 
 def readSourceArchive(sourcePath):
-    unpackedDirectory = sourcePath.replace('.zip','')
+    unpackedDirectory = re.sub(r'\..+$', '', sourcePath)
     
     if not os.path.isdir(unpackedDirectory):  
         os.mkdir(unpackedDirectory)

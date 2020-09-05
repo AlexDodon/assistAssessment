@@ -1,0 +1,195 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Arch Linux) (preloaded format=pdflatex 2020.9.2)  5 SEP 2020 19:52
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**documentation.tex
+(./documentation.tex
+LaTeX2e <2020-02-02> patch level 5
+L3 programming layer <2020-06-03>
+(/usr/share/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2019/12/20 v1.4l Standard LaTeX file (size option)
+)
+\c@part=\count167
+\c@section=\count168
+\c@subsection=\count169
+\c@subsubsection=\count170
+\c@paragraph=\count171
+\c@subparagraph=\count172
+\c@figure=\count173
+\c@table=\count174
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen134
+)
+(/usr/share/texmf-dist/tex/latex/listings/listings.sty
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks15
+)
+\lst@mode=\count175
+\lst@gtempboxa=\box45
+\lst@token=\toks16
+\lst@length=\count176
+\lst@currlwidth=\dimen135
+\lst@column=\count177
+\lst@pos=\count178
+\lst@lostspace=\dimen136
+\lst@width=\dimen137
+\lst@newlines=\count179
+\lst@lineno=\count180
+\lst@maxwidth=\dimen138
+
+(/usr/share/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
+\c@lstnumber=\count181
+\lst@skipnumbers=\count182
+\lst@framebox=\box46
+)
+(/usr/share/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2020/03/24 1.8d listings configuration
+))
+Package: listings 2020/03/24 1.8d (Carsten Heinz)
+
+(/usr/share/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2018/08/11 v1.3c Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+)
+(/usr/share/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2019/11/23 v1.2a Standard LaTeX Color (DPC)
+
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 147.
+
+(/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
+))
+Package color Info: Redefining color cyan on input line 17.
+
+(/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdfmode.def
+File: l3backend-pdfmode.def 2020-06-03 L3 backend support: PDF mode
+\l__kernel_color_stack_int=\count183
+\l__pdf_internal_box=\box47
+)
+(./documentation.aux)
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 37.
+LaTeX Font Info:    ... okay on input line 37.
+\c@lstlisting=\count184
+
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count185
+\scratchdimen=\dimen139
+\scratchbox=\box48
+\nofMPsegments=\count186
+\nofMParguments=\count187
+\everyMPshowfont=\toks19
+\MPscratchCnt=\count188
+\MPscratchDim=\dimen140
+\MPnumerator=\count189
+\makeMPintoPDFobject=\count190
+\everyMPtoPDFconversion=\toks20
+)
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <14.4> on input line 39.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 39.
+
+Overfull \hbox (23.83899pt too wide) in paragraph at lines 52--53
+[]\OT1/cmr/m/n/12 For run-ning Haskell code, it uses the com-mand \OT1/cmtt/m/n
+/12 stack ghc -- -o <binary>
+ []
+
+
+Overfull \hbox (25.10013pt too wide) in paragraph at lines 58--59
+[]\OT1/cmr/m/n/12 For run-ning PolyML code, it uses the com-mand \OT1/cmtt/m/n/
+12 poly --use <sourceFile>\OT1/cmr/m/n/12 . 
+ []
+
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (2.00722pt too wide) in paragraph at lines 112--113
+[]\OT1/cmtt/m/n/12 [[exampleResult]]\OT1/cmr/m/n/12 . Can have mul-ti-ples of t
+his place-holder. Each
+ []
+
+[2]
+Overfull \hbox (4.18387pt too wide) in paragraph at lines 145--146
+[]\OT1/cmr/m/n/12 E.g. \OT1/cmtt/m/n/12 python assistAssessment.py -F -p zipLis
+t.xml -l Haskell
+ []
+
+
+Overfull \hbox (6.58551pt too wide) in paragraph at lines 145--146
+\OT1/cmtt/m/n/12 -p zipList.xml -l Python -p genPrimes.xml -l PolyML \OT1/cmr/m
+/n/12 should re-
+ []
+
+[3]
+Overfull \hbox (11.50854pt too wide) in paragraph at lines 170--171
+[]\OT1/cmr/m/n/12 E.g. \OT1/cmtt/m/n/12 python assistAssessment.py -E -p flatte
+nDeepList.xml
+ []
+
+
+Overfull \hbox (41.89957pt too wide) in paragraph at lines 170--171
+\OT1/cmtt/m/n/12 -l Python -s sampleSolutions/p1.py -p genPrimes.xml -l PolyML
+ []
+
+[4] [5]
+Overfull \hbox (30.03355pt too wide) in paragraph at lines 249--250
+[]\OT1/cmr/m/n/12 E.g. \OT1/cmtt/m/n/12 python assistAssessment.py -E -a -p fla
+ttenDeepList.xml
+ []
+
+
+Overfull \hbox (29.54956pt too wide) in paragraph at lines 249--250
+\OT1/cmtt/m/n/12 -l Python -p zipList.xml -l Python -s student^^SsSolutions.zip
+
+ []
+
+[6] [7]
+Overfull \hbox (0.2651pt too wide) in paragraph at lines 371--372
+[]\OT1/cmr/m/n/12 The sec-ond is \OT1/cmtt/m/n/12 formatTex(text, solution, exa
+mple, language)\OT1/cmr/m/n/12 . This
+ []
+
+[8] (./documentation.aux) ) 
+Here is how much of TeX's memory you used:
+ 2574 strings out of 480478
+ 35355 string characters out of 5905960
+ 274463 words of memory out of 5000000
+ 18642 multiletter control sequences out of 15000+600000
+ 535267 words of font info for 34 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 28i,6n,40p,511b,1598s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-s
+uper-ts1.enc}</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb><
+/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmtt12.pfb></usr/share/texmf-dist/fonts/type1/public/cm-
+super/sfrm1200.pfb>
+Output written on documentation.pdf (8 pages, 70174 bytes).
+PDF statistics:
+ 52 PDF objects out of 1000 (max. 8388607)
+ 36 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

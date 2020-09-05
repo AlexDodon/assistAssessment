@@ -1,6 +1,8 @@
 \documentclass[a4paper,12pt]{article}
 
+\usepackage{listings}
 \usepackage[utf8]{inputenc}
+\usepackage{color}
 
 \title{AssistAssessment Documentation}
 \author{}
@@ -10,7 +12,362 @@
   /Title    (AssistAssessment Documentation)
 }
 
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  showstringspaces=false,
+  commentstyle=\color{gray}\upshape
+}
+
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{darkblue},
+  keywordstyle=\color{cyan},
+  morekeywords={xmlns,version,type}% list your attributes here
+}
+
 \begin{document}
+    
 \maketitle
+
+\section{Main Idea}
+
+The script accomplishes two main functionalities. The first is to format a XML file containing the problem specification to a latex-friendly format, and the second is to evaluate code for certain languages and compare the output to the output of a reference implementation in the problem file.
+
+\section{Dependencies}
+
+\begin{itemize}
+ \item This script was developed for python 3(3.8.5).
+ 
+ \item For running Python code, it uses the command \texttt{python}. The source code is piped to stdin.
+ 
+ \item For running Haskell code, it uses the command \texttt{stack ghc -- -o <binary> <sourceFile>}.
+ 
+ \item For running CommonLisp code, it uses the command \texttt{sbcl --script <sourceFile>} (Steel Bank Common Lisp).
+ 
+ The first line of the output is discarded as it is empty.
+ 
+ \item For running PolyML code, it uses the command \texttt{poly --use <sourceFile>}. 
+ 
+ The solution definition is given by parameter and the tests are piped to stdin. 
+ 
+ The first line of the output is discarded as it is information about the version.
+\end{itemize}
+
+All of the above should be pretty painless to change as long as the behaviour of the new command is similar.
+
+
+
+\section{Problem description format}
+
+\lstset{language=XML}
+\begin{lstlisting}
+<problem>
+<text>
+
+</text>
+<example language="Some Language">
+
+</example>
+<solution language="Some Language">
+
+</solution>
+<tests language="Some Language">
+
+</tests>
+</problem>
+\end{lstlisting}
+
+Above is the empty structure of the XML problem description file.
+
+Some considerations:
+\begin{itemize}
+ \item All whitespace get included in the formatted output, so the tags of this XML file and their contents shouldn't be indented.
+ \item There can be multiple example, solution and tests tags but, for each specific language, only the first of each tag is considered. 
+ 
+ This means that problem descriptions in multiple languages can be contained in the same file.
+ 
+ Example, solution and tests tags without a recognized language attribute will be ignored.
+ 
+ \item Recognized languages: Python, Haskell, PolyML, CommonLisp.
+ 
+ \item The \texttt{<text>} tag contains the text of the problem that will be used for formating. 
+ 
+ It supports a number of placeholders:
+ 
+ \begin{itemize}
+ 
+  \item \texttt{[[function]]} will be replaced by the signature of the main function to be tested. Differs for each language.
+  
+  \item \texttt{[[callExample]]}. Can have multiples of this placeholder. Each placeholder will be replaced by the coresponding line in the XML \texttt{<example>} tag. Can have fewer instances of this placeholder than lines inside the example tag.
+  
+  \item \texttt{[[exampleResult]]}. Can have multiples of this placeholder. Each placeholder will be replaced by the coresponding result of running the respective example line against the solution. The number of these placeholders should match the number of \texttt{[[callExample]]} placeholders.
+  
+  \item \texttt{[[genericExample]]} includes all examples specified inside the \texttt{<example>} tag and formats them in a sentence.
+    
+ \end{itemize}
+ 
+ \item The \texttt{<example>} tag expects a single example per line.
+ 
+ An example is a simple call of a function. E.g. calling the Haskell function zip: \texttt{zip [1,2,3] ["a","b","c"]}.
+ 
+ \item The solution tag should contain the correct implementation of the function that will be tested. For Haskell, its declaration should be on the first line. For Python and CommonLisp, the function to be tested should start on the first line. For PolyML, it doesn't matter.
+
+ \item The \texttt{<tests>} tag is subject to the same restrictions as the \texttt{<example>} tag. It will be used to evaluate and compare desired sources to the reference implementation. The two tags are different to permit more extensive testing while maybe exemplifying more limited behaviour.
+ 
+\end{itemize}
+
+\section{Usage}
+\begin{itemize}
+ 
+ \item 
+
+ For outputing a latex friendly format, the flags \texttt{-F, -p} and \texttt{-l} are relevant. 
+
+ The \texttt{-F} flag is mutually exclusive with \texttt{-E} and specifies the formatting operation. 
+
+ The \texttt{-p} should specify the path to a XML problem description file. 
+
+ For each \texttt{-p} there must be a corresponding \texttt{-l} flag that should specify one of the supported languages for which there are appropriately completed \texttt{<solution>} and \texttt{<example>} tags within the specified problem description file.
+
+ There can be multiple pairs of \texttt{-p} and \texttt{-l} flags and the script will process them in the specified order.
+ 
+ The formatted text is both outputted to stdout and written to a file for each pair of problem description and language.
+ 
+ E.g. \texttt{python assistAssessment.py -F -p zipList.xml -l Haskell -p zipList.xml -l Python -p genPrimes.xml -l PolyML} should return(the text displayed is not raw):
+ 
+ Write a function \texttt{myZip::[a] -> [b] -> [(a,b)]} which takes as arguments 2 lists and zips them. For example, \texttt{myZip ["a","b","c"] [1,2,3]} must definitely return \texttt{[("a",1),("b",2),("c",3)]}, while on the other hand, \texttt{myZip [1,2,3] ["a","b","c"]} should most certainly return \texttt{[(1,"a"),(2,"b"),(3,"c")]}.
+
+Write a function \texttt{myZip(a,b)} which takes as arguments 2 lists and zips them. For example, \texttt{myZip(["a","b","c"],[1,2,4])} must definitely return \texttt{[('a', 1), ('b', 2), ('c', 4)]}, while on the other hand, \texttt{myZip([1,2,3],["a","b","c"])} should most certainly return \texttt{[(1, 'a'), (2, 'b'), (3, 'c')]}.
+
+Write a function \texttt{primes = fn: int -> int list} which takes one argument, an integer n, and resturns a list containing the first primes up to n. E.g. \texttt{primes(20);} should return \texttt{[2, 3, 5, 7, 11, 13, 17, 19]: int list}.
+ 
+ 
+ \item
+ 
+ For evaluating source files and comparing their output to a reference implementation, the \texttt{-E, -p, -l, -s} and \texttt{-a} are relevant.
+ 
+ The \texttt{-E} flag is mutually exclusive with \texttt{-F} and specifies the evaluating operation. 
+
+ The \texttt{-p} should specify the path to a XML problem description file. 
+
+ For each \texttt{-p} there must be a corresponding \texttt{-l} flag that should specify one of the supported languages for which there are appropriately completed \texttt{<solution>} and \texttt{<tests>} tags within the specified problem description file.
+
+ 
+ \begin{itemize}
+  \item 
+  
+ The \texttt{-s} flags without the \texttt{-a} should specify the path to a source file that should be compared to the reference solution. In this case, there can be multiple tuples of tags and  there should be the same number of \texttt{-p, -l} and \texttt{-s} tags with the meaning that the source file specified by the first \texttt{-s} tag tries to solve the problem specified by the first \texttt{-p} tag in the language specified by the first \texttt{-l} tag and so on.
+
+E.g. \texttt{python assistAssessment.py -E -p flattenDeepList.xml -l Python -s sampleSolutions/p1.py -p genPrimes.xml -l PolyML -s sampleSolutions/genPrimes.ml} should return:
+
+------------------------------------------------
+
+------------------------------------------------
+
+------------------------------------------------
+
+        Evaluating sampleSolutions/p1.py:
+
+------------------------------------------------
+
+For the correct answer:
+
+[1, 2, 3, 4, 5, 6]
+
+[2, 3, 4, 5, 6, 7]
+
+------------------------------------------------
+
+The source file 
+
+        sampleSolutions/p1.py
+
+has produced the answer:
+
+[1, 2, 3, 4, 5, 6]
+
+[2, 3, 4, 5, 6, 7]
+
+------------------------------------------------
+
+The given solution is correct.
+
+------------------------------------------------
+
+------------------------------------------------
+
+------------------------------------------------
+
+------------------------------------------------
+
+        Evaluating sampleSolutions/genPrimes.ml:
+
+------------------------------------------------
+
+For the correct answer:
+
+[2, 3, 5, 7, 11, 13, 17, 19]: int list
+
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29]: int list
+
+------------------------------------------------
+
+The source file 
+
+        sampleSolutions/genPrimes.ml
+
+has produced the answer:
+
+[2, 3, 5, 7]: int list
+
+[2, 3, 5, 7, 11, 13, 17, 19]: int list
+
+------------------------------------------------
+
+The given solution is wrong.
+
+------------------------------------------------
+ 
+  \item
+   The \texttt{-s} flag, when the \texttt{-a} flag is specified, should point to an archive. The archive should have the proper extension and it will be extracted by \texttt{shutil.unpack-archive}, which supports "zip", "tar", "tar.gz", "tar.bz", "tar.xz". 
+   
+   When using the \texttt{-a} flag, there should be a single \texttt{-s} flag specified.
+   
+   The archive will be extracted to a directory of the same name. If said directory exists, the script will skip the extraction step, but the \texttt{-s} path should still point to the archive.
+   
+   The expected structure of the archive is: the archive directly containing directories; one for each student; inside each directory is another archive which directly contains that student's source files.
+   
+   E.g. \texttt{python assistAssessment.py -E -a -p flattenDeepList.xml -l Python -p zipList.xml -l Python -s student\'sSolutions.zip} should return(It's a sample; the whole thing would be longer): 
+   
+------------------------------------------------
+
+------------------------------------------------
+
+------------------------------------------------
+
+        Grading bob's solutions:
+
+------------------------------------------------
+
+Testing a new permutation of answers.
+
+------------------------------------------------
+
+For the correct answer:
+
+[1, 2, 3, 4, 5, 6]
+
+[2, 3, 4, 5, 6, 7]
+
+[3, 4, 5, 6, 7, 8]
+
+[4, 5, 6, 7, 8, 9]
+
+[5, 6, 7, 8, 9, 10]
+
+------------------------------------------------
+
+The student
+
+        bob
+
+has produced the answer:
+
+[1, 2, 3, 4, 5, 6]
+
+[2, 3, 4, 5, 6, 7]
+
+[3, 4, 5, 6, 7, 8]
+
+[4, 5, 6, 7, 8, 9]
+
+[5, 6, 7, 8, 9, 10]
+
+------------------------------------------------
+
+The given solution is correct.
+
+------------------------------------------------
+
+------------------------------------------------
+
+For the correct answer:
+
+[('a', 1), ('b', 2), ('c', 4)]
+
+[(1, 'a'), (2, 'b'), (3, 'c')]
+
+[(1, 1), (2, 2), (3, 3)]
+
+------------------------------------------------
+
+The student
+
+        bob
+
+has produced the answer:
+
+[('a', 1), ('b', 2), ('c', 4)]
+
+[(1, 'a'), (2, 'b'), (3, 'c')]
+
+[(1, 1), (2, 2), (3, 3)]
+
+------------------------------------------------
+
+The given solution is correct.
+
+------------------------------------------------
+
+For this permutation of answers, bob has solved correctly 2/2 problems.
+
+------------------------------------------------
+
+------------------------------------------------
+
+In the end, bob has solved correctly 2/2 problems.
+
+------------------------------------------------
+
+------------------------------------------------
+
+------------------------------------------------
+
+Results:
+
+\texttt{Name                          | Number of sources   | Grade}
+
+------------------------------------------------------------
+
+\texttt{andrei                        | 1/2                 | 1/2}
+
+\texttt{costel                        | 2/2                 | 0/2}
+
+\texttt{bob                           | 2/2                 | 2/2}
+
+   
+ \end{itemize}
+ 
+\end{itemize}
+
+
+\section{Maintaining/Modifying}
+
+Both are encouraged. The script should be fairly readable, see comments for more details. 
+
+If support for another language is desired, there are two functions that are of concern. 
+
+The first is \texttt{evaluateSourceOnTest(source, test, language)}. This function is responsible for running code. Add an \texttt{if language == 'New Language'} block and assign to \texttt{result} the desired output.
+
+The second is \texttt{formatTex(text, solution, example, language)}. This function is responsible for formatting the problem text to a TEX format. Add an \texttt{if language == 'New Language'} block and preprocess the \texttt{text, signature} and \texttt{example}.
 
 \end{document}

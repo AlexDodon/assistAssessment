@@ -47,9 +47,9 @@ The script accomplishes two main functionalities. The first is to format a XML f
 \begin{itemize}
  \item This script was developed for python 3(3.8.5).
  
- \item For running Python code, it uses the command \texttt{python}. The source code is piped to stdin.
+ \item For running Python code, it uses the command \texttt{python3}. The source code is piped to stdin.
  
- \item For running Haskell code, it uses the command \texttt{stack ghc -- -o <binary> <sourceFile>}.
+ \item For running Haskell code, it uses the command \texttt{ghc -o <binary> <sourceFile>}.
  
  \item For running CommonLisp code, it uses the command \texttt{sbcl --script <sourceFile>} (Steel Bank Common Lisp).
  
@@ -127,7 +127,7 @@ Some considerations:
 
 \section{Usage}
 
-It should be noted that this script compiles and runs arbitrary code. There is the threat of a malicious actor. The script should be run inside some form of sandbox/container/virtual machine.
+It should be noted that this script compiles and runs arbitrary code. There is the threat of a malicious actor. The script should be run inside some form of sandbox/container/virtual machine. Check the next section for instructions about running the script inside a docker container.
 
 \begin{itemize}
  
@@ -362,6 +362,19 @@ Results:
  
 \end{itemize}
 
+
+\section{Running inside a Docker Container}
+
+The attached Dockerfile can be used to build an image. While inside the repository, you can just run \texttt{buildDockerImage.sh} or run directly the command \texttt{docker build --tag assist-assessment .} .
+
+Now the script can be run inside a container by using \texttt{docker run -it --rm -v "\$PWD":/workingDir assist-assessment python3} 
+
+\texttt{/scriptDir/assistAssessment.py <script arguments>}.
+
+This command will create a temporary container, will mount the current directory to said container as the working directory and execute the script. Relative paths inside the current directory can be used. Absolute paths and relative paths outside the current directory will be relative to the container's filesystem.
+There is a wrapper for this command: \texttt{containedAssistAssessment.sh}. It will also prompt the user if it is ok to expose the current directory to the container.
+
+For ease of use, the wrapper can pe added to the user's \$PATH.
 
 \section{Maintaining/Modifying}
 

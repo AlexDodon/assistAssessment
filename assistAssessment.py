@@ -10,7 +10,7 @@ def evaluateSourceOnTest(source, test, language):
     #Central point for executing code
     #From each execution it just captures stdout and stderr
     #Because of this, generally, each test (line) is wrapped by some print statement
-    #If there are problems with dependencies, change the command run in supbrocess.run; for example, in the case of Haskell use the system ghc instead of the stack ghc by changing the command list to ['ghc', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs']
+    #If there are problems with dependencies, change the command run in supbrocess.run; for example, in the case of Haskell use stack ghc instead of the system ghc by changing the command list to ['stack', 'ghc', '--', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs']
     result = ''
     if language == 'Python':
         source += '\n'
@@ -18,7 +18,7 @@ def evaluateSourceOnTest(source, test, language):
             if testLine != '':
                 source += 'print(' + testLine + ')\n'
         
-        p = subprocess.run('python', input=source, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        p = subprocess.run('python3', input=source, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         
         result = p.stdout
 
@@ -36,7 +36,7 @@ def evaluateSourceOnTest(source, test, language):
             f.write(toEvalFile)
             f.close()
 
-            p = subprocess.run(['stack', 'ghc','--', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            p = subprocess.run(['ghc', '-o', '/tmp/sol', '/tmp/assistAssessment/toEvalFile.hs'], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
             p = subprocess.run('/tmp/sol', text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             
@@ -392,7 +392,7 @@ def getArgs():
 
     
     parser.add_argument('-p','--problem-path', dest='problemPathList', action='append', metavar='problemPath', 
-        help='Path to a problem file. Can pass multiple times to specify multiple problem files. For each -p, you should specify a -l. With regards to -E, if using -a, that means that each student should have solved that many problems. Students that have less source files in their archive will not be graded')
+        help='Path to a problem file. Can pass multiple times to specify multiple problem files. For each -p, you should specify a -l. With regards to -E, if using -a, that means that each student should have solved that many problems.')
 
     parser.add_argument('-s','--source-path', dest='sourcePathList', action='append', metavar='sourcePath',
         help='Path to source file[s] to be evaluated. With regards to -E, when using -a, it should point to an archive and be passed a single time. Otherwise, each source file specified by -s corresponds to a problem description given by -p.')
